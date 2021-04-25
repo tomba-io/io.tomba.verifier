@@ -1,0 +1,8 @@
+{
+  "appId": "com.example.app",
+  "appName": "Tomb",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "dist",
+  "linuxAndroidStudioPath": "/home/moha/android-studio/bin/studio.sh"
+}
