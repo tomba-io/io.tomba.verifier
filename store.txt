@@ -1,0 +1,23 @@
+Email Verifier tool allows you to verify your email contact list with ease and accuracy.
+
+All you need to do is input the email addresses you want to verify, and our tool will handle the rest. Here's what our tool checks:
+
+1. Email Syntax: Ensures the email address is in the correct format.
+
+2. Email Domain: Verifies that the domain is valid and active.
+
+3. MX Record: Checks for the existence of an email server for the provided domain.
+
+4. Email Existence: Confirms that the email address actually exists and can receive emails.
+
+5. Individual Email Verification: Each email address is verified individually to ensure accuracy.
+
+6. Public Source Check: The tool also checks all available public sources for the email address and provides the last discovery dates.
+
+7. Domain WHOIS Data: It extracts information about the domain from WHOIS data.
+
+Should you have any questions or suggestions, please do not hesitate to reach us at info@tomba.io.
+
+**IMPORTANT NOTES**
+
+The Email Verifier tool requires a Tomba KEY and SECRET to operate. It is designed specifically for the verification of professional email addresses.
