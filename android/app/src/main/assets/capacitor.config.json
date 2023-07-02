@@ -1,8 +1,8 @@
 {
-  "appId": "com.example.app",
-  "appName": "Tomb",
-  "bundledWebRuntime": false,
-  "npmClient": "yarn",
-  "webDir": "dist",
-  "linuxAndroidStudioPath": "/home/moha/android-studio/bin/studio.sh"
+	"appId": "io.tomba.verifier",
+	"appName": "Email Verifier",
+	"bundledWebRuntime": false,
+	"npmClient": "yarn",
+	"webDir": "dist",
+	"linuxAndroidStudioPath": "/home/moha/android-studio/bin/studio.sh"
 }
