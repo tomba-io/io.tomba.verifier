@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "allowJs": true,
     "paths": {
       "~/*": ["./*"],
       "@/*": ["./*"],
@@ -8,5 +9,11 @@
       "@@/*": ["./*"]
     }
   },
-  "exclude": ["node_modules", ".nuxt", "dist"]
+  "exclude": ["node_modules", ".nuxt", "dist"],
+  "vueCompilerOptions": {
+    "target": 2,
+    "extensions": [
+      ".vue"
+    ]
+  }
 }
