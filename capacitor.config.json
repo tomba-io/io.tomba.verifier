@@ -1,6 +1,6 @@
 {
-  "appId": "com.example.app",
-  "appName": "Tomb",
+  "appId": "io.tomba.verifier",
+  "appName": "Email Verifier",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
   "webDir": "dist",
