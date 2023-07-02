@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "run ionic capacitor android",
+      "type": "shell",
+      "command": "npx cap run android -l --external"
+    }
+  ]
+}
