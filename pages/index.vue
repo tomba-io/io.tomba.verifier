@@ -1,96 +1,183 @@
 <template>
-  <v-layout column justify-center align-center>
+  <v-layout justify-center align-center>
     <v-flex xs12 sm8 md6>
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
       <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
+        <v-card-title class="headline py-2">
+          Tomba Email Verifier
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon color="blue" small v-bind="attrs" v-on="on"
+                >mdi-help-circle-outline</v-icon
+              >
+            </template>
+            <span class="py-6">
+              Enter an email address below to check in real-time if it's real
+            </span>
+          </v-tooltip>
         </v-card-title>
-        <v-card-text>
-          <p>
-            Vuetify is a progressive Material Design component framework for
-            Vue.js. It was designed to empower developers to create amazing
-            applications.
-          </p>
-          <p>
-            For more information on Vuetify, check out the
-            <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation </a
-            >.
-            <nuxt-link to="/inspire">inspire</nuxt-link>
-          </p>
-          <p>
-            If you have questions, please join the official
-            <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord </a
-            >.
-          </p>
-          <p>
-            Find a bug? Report it on the github
-            <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board </a
-            >.
-          </p>
-          <p>
-            Thank you for developing with Vuetify and I look forward to bringing
-            more exciting features in the future.
-          </p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3" />
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br />
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" nuxt to="/inspire">
-            Continue
-          </v-btn>
-        </v-card-actions>
+        <v-form ref="form" @submit.prevent="submitForm">
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="6" offset-sm="3">
+                <v-text-field
+                  v-model="email"
+                  placeholder="name@company.com"
+                  label="Email"
+                  required
+                  :rules="emailRules"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" sm="6" offset-sm="3">
+                <v-btn type="submit" color="primary">
+                  <v-icon left> mdi-email</v-icon>Verify
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
       </v-card>
+      <br v-if="disposable" />
+      <v-alert v-if="disposable" type="info" dismissible>
+        This domain name is used to hide real email addresses so we don't
+        perform the verification. 💡
+      </v-alert>
+      <br v-if="webmail" />
+      <v-alert v-if="webmail" type="info" dismissible>
+        Tomba is designed to contact other professionals. This domain name is
+        used to create personal email addresses so we don't perform the
+        verification. 💡
+      </v-alert>
+      <v-skeleton-loader v-if="load" type="card"></v-skeleton-loader>
+      <br />
+      <verify v-if="show" :data="data" />
     </v-flex>
+    <v-snackbar v-model="snackbar">
+      {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-layout>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
-
 export default {
-  components: {
-    Logo,
-    VuetifyLogo,
+  data() {
+    return {
+      email: '',
+      emailRules: [
+        (value) => !!value || 'Email is required',
+        (value) => /.+@.+\..+/.test(value) || 'Invalid email address',
+      ],
+      show: false,
+      load: false,
+      data: null,
+      disposable: false,
+      webmail: false,
+      account: JSON.parse(localStorage.getItem('account')),
+      snackbar: false,
+      text: `Connect to Verifier this email.`,
+    }
+  },
+  computed: {
+    key() {
+      return this.$store.getters.key
+    },
+    secret() {
+      return this.$store.getters.secret
+    },
+    emails() {
+      return this.$store.getters.emails
+    },
+  },
+  mounted() {
+    if (this.$route.query.email) {
+      this.email = this.$route.query.email
+    }
+    this.loadState()
+  },
+  methods: {
+    loadState() {
+      if (localStorage.getItem('key')) {
+        this.$store.commit('setKey', localStorage.getItem('key'))
+      }
+      if (localStorage.getItem('secret')) {
+        this.$store.commit('setSecret', localStorage.getItem('secret'))
+      }
+      if (localStorage.getItem('account')) {
+        this.$store.commit('setAccount', localStorage.getItem('account'))
+      }
+      if (localStorage.getItem('emails')) {
+        this.$store.commit('loadJSON', localStorage.getItem('emails'))
+      }
+    },
+    saveState() {
+      localStorage.setItem('emails', this.$store.getters.toJSON)
+    },
+    checkEmail(email) {
+      const foundEmail = this.emails.find(
+        (entry) => entry.email.email === email
+      )
+      return foundEmail
+    },
+    submitForm() {
+      if (this.$refs.form.validate()) {
+        this.load = true
+        this.disposable = false
+        this.webmail = false
+        if (!this.account) {
+          this.load = false
+          // console.log(this.checkEmail(this.email))
+          this.snackbar = true
+          setTimeout(() => {
+            this.$router.push({ path: '/connection' })
+          }, 1000)
+        } else if (this.checkEmail(this.email)) {
+          this.load = false
+          this.show = true
+          this.data = this.checkEmail(this.email)
+        } else {
+          // Form is valid, you can perform further actions here
+          const TombaInstance = (key, secret) =>
+            this.$axios.create({
+              baseURL: 'https://api.tomba.io/v1',
+              headers: {
+                'X-Tomba-Key': key,
+                'X-Tomba-Secret': secret,
+                'X-Tomba-Origin': 'extension',
+              },
+            })
+          TombaInstance(this.key, this.secret)
+            .$get(`/email-verifier/${this.email}`)
+            .then((rest) => {
+              this.data = rest.data
+              console.log(this.data)
+              this.load = false
+              if (!this.data.email.disposable && !this.data.email.webmail) {
+                this.show = true
+                this.$store.commit('addEmails', this.data)
+                this.saveState()
+              }
+              if (this.data.email.disposable) {
+                this.disposable = true
+              }
+              if (this.data.email.webmail) {
+                this.webmail = true
+              }
+            })
+            .catch((err) => {
+              // this.$router.push(`/verify`)
+              console.log(err)
+              this.load = false
+            })
+        }
+      }
+    },
   },
 }
 </script>
